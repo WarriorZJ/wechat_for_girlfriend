@@ -1,0 +1,68 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: Python application
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  schedule:
+    - cron: '55 23 * * *'  # UTC 23:55 → 北京 07:55
+    - cron: '55 09 * * *'  # UTC 09:55 → 北京 17:55
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      PIP_INDEX_URL: https://pypi.tuna.tsinghua.edu.cn/simple
+      PIP_DEFAULT_TIMEOUT: 60
+
+    steps:
+      # ✅ 已升级（关键点）
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # ✅ 已升级（支持 Node.js 24）
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"   # 自动缓存依赖，加快构建
+
+      - name: Install dependencies with retry
+        run: |
+          python -m pip install --upgrade pip
+
+          for i in {1..3}; do
+            pip install --no-cache-dir flake8 pytest && break
+            echo "基础依赖安装失败，10 秒后重试..."
+            sleep 10
+          done
+
+          if [ -f requirements.txt ]; then
+            for i in {1..3}; do
+              pip install --no-cache-dir -r requirements.txt && break
+              echo "requirements.txt 安装失败，10 秒后重试..."
+              sleep 10
+            done
+          fi
+
+      - name: Lint with flake8
+        run: |
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+      - name: Run Python script with retry
+        run: |
+          for i in {1..3}; do
+            echo "尝试运行 main.py (第 $i 次)..."
+            python main.py && break
+            echo "执行失败，10 秒后重试..."
+            sleep 10
+          done
