@@ -527,7 +527,7 @@ data = {"m_n_a": {"value": m_n_a, "color": get_random_color()},
 """
 # 模拟登录微信客户端
 client = WeChatClient(app_id, app_secret)
-# 实例化微信客户端x
+# 实例化微信客户端
 wm = WeChatMessage(client)
 
 """
@@ -552,80 +552,3 @@ for i in range(0, len(user_id1)):
           f"  ===家乡:{data['city2']['value']} 天气:{data['weather2']['value']} 气温:{data['temperature2']['value']}===\n"
           f"  今日电影推荐：{data['mv']['value']}\n"
           f"  每日一句：{data['words']['value'].strip()}\n")
-
-# 模板
-'''
-=== 记得{{punch.DATA}}哦! ===
-问候：{{m_n_a.DATA}}
-祝福：{{eat.DATA}}
-所在城市：{{city1.DATA}} 
-当前时间：{{daytime.DATA}} 
-农历：{{nongli.DATA}} 
-今日天气：{{weather1.DATA}} 
-当前温度：{{temperature1.DATA}} 
-注意：{{sid.DATA}}
-距离生日还有{{birthday_lover.DATA}}天
-距离元旦还有{{yd.DATA}}天 
-距离春节还有{{cj.DATA}}天 
-=== 家乡:{{city2.DATA}} 天气:{{weather2.DATA}} 气温:{{temperature2.DATA}} === 
-今日电影推荐：{{mv.DATA}} 
-今天是我们在一起的第{{love_days.DATA}}天！
-每日一句：{{words.DATA}}
-'''
-
-# 模板
-"""
-=== 记得{{punch.DATA}}哦! ===
-问候：{{m_n_a.DATA}} 
-祝福：{{eat.DATA}} 
-所在城市：{{city1.DATA}} 
-当前时间：{{daytime.DATA}} 
-农历：{{nongli.DATA}} 
-今日天气：{{weather1.DATA}} 
-当前温度：{{temperature1.DATA}} 
-注意：{{sid.DATA}} 
-距离生日还有{{birthday_lover.DATA}}天 
-距离元旦还有{{yd.DATA}}天 
-距离春节还有{{cj.DATA}}天 
-=== 家乡:{{city2.DATA}} 天气:{{weather2.DATA}} 气温:{{temperature2.DATA}} === 
-今日电影推荐：{{mv.DATA}} 
-我们已经在一起 {{love_days.DATA}} 天啦！ 
-每日一句：{{words.DATA}}
-"""
-'''
-问候：{{m_n_a.DATA}}
-祝福：{{eat.DATA}}
-所在城市：{{city1.DATA}} 
-当前时间：{{daytime.DATA}} 
-农历：{{nongli.DATA}} 
-今日天气：{{weather1.DATA}} 
-当前温度：{{temperature1.DATA}} 
-注意：{{sid.DATA}}
-距离生日还有{{birthday_lover.DATA}}天
-距离元旦还有{{yd.DATA}}天 
-距离春节还有{{cj.DATA}}天 
-===家乡:{{city2.DATA}} 天气:{{weather2.DATA}} 气温:{{temperature2.DATA}}=== 
-今日电影新片榜首：{{mv.DATA}} 
-每日一句：{{words.DATA}}
-'''
-
-'''
-今日天气：{{weather1.DATA}} 
-当前温度：{{temperature1.DATA}} 
-{{sid.DATA}}
-距离元旦还有{{yd.DATA}}天 
-距离春节还有{{cj.DATA}}天 
-每日一句：{{words.DATA}}
-距离领导的生日还有{{birthday_lover.DATA}}天 
-距离秘书的生日还有{{birthday_my.DATA}}天 
-'''
-
-"""
-今日天气：{{weather1.DATA}} 
-当前温度：{{temperature1.DATA}} 
-{{sid.DATA}} 
-今天是我们在一起的第{{love_days.DATA}}天 
-距离元旦还有{{yd.DATA}}天 
-距离春节还有{{cj.DATA}}天 
-每日一句：{{words.DATA}}
-"""
