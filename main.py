@@ -2,7 +2,7 @@ import configparser
 import os
 import random
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import requests
 import zhdate
@@ -36,6 +36,7 @@ user_id1 = user_id.split(",")
 
 
 def get_morning_words():
+    """早安/上午祝福语（共60条，无重复）"""
     morning_inspirations = [
         "今天会是美好的一天！",
         "早晨的阳光是新的开始。",
@@ -62,7 +63,6 @@ def get_morning_words():
         "新的一天，新的希望，继续加油！",
         "给自己一个微笑，开始新的一天。",
         "挑战自己，迎接美好的一天。",
-        "阳光明媚，心情也跟着明亮。",
         "从早晨开始，做最好的自己。",
         "每天都是全新的机会，抓住它！",
         "今天做更好的自己，明天更精彩。",
@@ -76,26 +76,35 @@ def get_morning_words():
         "迎接新的一天，充满正能量。",
         "今天的努力，给明天铺路。",
         "每天都是新的希望，做最好的自己。",
-        "无论如何，早起的鸟儿有虫吃！"
+        "无论如何，早起的鸟儿有虫吃！",
+        "晨光正好，你也正好。",
+        "推开窗，世界都在对你微笑。",
+        "今天的风，都是甜的。",
+        "新的一天，愿你被温柔以待。",
+        "每一个清晨，都是生命给你的礼物。",
+        "早安，愿你今天比昨天更快乐。",
+        "太阳升起，好运也随之而来。",
+        "用一杯热咖啡，开启元气满满的一天。",
+        "清晨的第一缕阳光，专属于你。",
+        "今天也要做闪闪发光的自己呀。",
+        "起床啦！美好的事情正在等你。",
+        "每一个早晨，都是重新出发的机会。",
+        "早安，今天也要开心哦！",
+        "新的一天，愿所有美好不期而遇。",
+        "睁开眼，就是崭新的世界。",
+        "晨风轻拂，愿你心情如花绽放。",
+        "今天是值得期待的一天！",
+        "早起的你，已经赢了全世界一半。",
+        "清晨好，愿你的一天充满小确幸。",
+        "早安！记得吃早餐，照顾好自己。",
     ]
 
-    # 随机选择一句话
-    random_inspiration = random.choice(morning_inspirations)
-    return random_inspiration
+    return random.choice(morning_inspirations)
 
 
 def get_eatmorning_words():
-    list = [
-        "中午好！愿你今日心情超棒",
-        "午安，祝你午餐美味又开心",
-        "中午到啦，愿你生活甜如蜜",
-        "中午好呀，愿幸运时刻相随",
-        "午间愉快，愿身心自在轻松",
-        "中午安好，愿工作一切顺利",
-        "中午好，愿午后时光很惬意",
-        "午安！愿你享受惬意中午",
-        "中午时分，愿快乐常围绕你",
-        "中午好，愿笑容时刻挂嘴边",
+    """午间祝福语（共30条，无重复）"""
+    noon_words = [
         "中午好！愿你今日心情超棒",
         "午安，祝你午餐美味又开心",
         "中午到啦，愿你生活甜如蜜",
@@ -114,24 +123,26 @@ def get_eatmorning_words():
         "中午好，享受美好的午餐时光！",
         "中午好，愿你的每一天都充满阳光！",
         "中午愉快，笑容可掬，心情美好！",
-        "中午好，愿你的事业蒸蒸日上！"
+        "中午好，愿你的事业蒸蒸日上！",
+        "午安，忙了一上午，犒劳一下自己吧。",
+        "中午好，记得好好吃饭哦！",
+        "午间时光，愿你吃得开心，笑得灿烂。",
+        "中午好呀，给自己充充电再出发。",
+        "午安！愿你午后一切顺顺利利。",
+        "中午好，吃饱了才有力气继续追梦。",
+        "午间小憩，愿你精力充沛。",
+        "中午好，今天也要元气满满哦！",
+        "午安，愿你午餐时光温暖又美好。",
+        "中午好，别忘了喝水，保持好状态！",
+        "午间好，愿你下午好运连连。",
     ]
 
-    return list[random.randint(0, len(list) - 1)]
+    return random.choice(noon_words)
 
 
 def get_afternoon_words():
-    list = [
-        "期待下午的阳光洒满心田。",
-        "下午的时间，总是充满希望。",
-        "盼望下午能有一个小小的休息。",
-        "希望下午的时光如诗如画。",
-        "下午，期待着美好的一切到来。",
-        "下午的宁静，给了我满满的动力。",
-        "期待下午有更多的美好发现。",
-        "下午的阳光，洒进了我的心房。",
-        "期待下午的时间更加充实。",
-        "下午，是放松心情的时刻。"
+    """下午祝福语（共30条，无重复）"""
+    afternoon_words = [
         "期待下午的阳光洒满心田。",
         "下午的时间，总是充满希望。",
         "盼望下午能有一个小小的休息。",
@@ -151,14 +162,25 @@ def get_afternoon_words():
         "期待下午可以有一个小小的冒险。",
         "午后的闲暇，时间悄悄流逝。",
         "下午的世界，充满了安静与美好。",
-        "下午的光景是一天中最温暖的时光。"
+        "下午的光景是一天中最温暖的时光。",
+        "下午好呀，愿你效率翻倍，早点下班！",
+        "午后时光，愿你一切顺利。",
+        "下午好，离下班又近了一步，加油！",
+        "午后的阳光，照亮你的好心情。",
+        "下午好，愿你手头的工作都顺顺利利。",
+        "下午时光，愿你收获满满的成就感。",
+        "下午好，坚持一下，胜利就在眼前！",
+        "午后微风，愿你心旷神怡。",
+        "下午好，今天也要努力鸭！",
+        "下午时光，愿你被好运眷顾。",
     ]
 
-    return list[random.randint(0, len(list) - 1)]
+    return random.choice(afternoon_words)
 
 
 def get_goodnight_words():
-    list = [
+    """傍晚/晚安祝福语（共50条，无重复）"""
+    night_words = [
         '傍晚愉快，愿你收获美好时光！',
         '夕阳西下，愿你心情如霞光灿烂！',
         '傍晚微风轻拂，愿你惬意自在！',
@@ -168,7 +190,7 @@ def get_goodnight_words():
         '傍晚安好，愿你享受宁静时光！',
         '夜幕降临，愿你温暖不减，幸福依然！',
         '晚霞如诗，愿你的心情也如诗般美好！',
-        '傍晚微凉，愿你温暖如初，幸福绵长！'
+        '傍晚微凉，愿你温暖如初，幸福绵长！',
         '傍晚好，愿你收获一天的温暖！',
         '夕阳西沉，愿你的烦恼随风而去！',
         '傍晚微风轻拂，带来幸福与宁静！',
@@ -208,15 +230,18 @@ def get_goodnight_words():
         '晚风送爽，愿你悠然自在！',
         '傍晚的时光，愿你尽享宁静！',
         '夕阳虽落，幸福常在！',
-        '夜色朦胧，愿你安心入梦！'
+        '夜色朦胧，愿你安心入梦！',
+        '辛苦了一天，晚上好好犒劳自己吧！',
+        '傍晚好，愿你有个愉快的夜晚！',
     ]
 
-    return list[random.randint(0, len(list) - 1)]
+    return random.choice(night_words)
 
 
 def get_beijing_time():
-    return datetime.now() + timedelta(hours=8)
-    # return datetime.now() + timedelta()
+    # 使用 timezone 正确处理东八区时间
+    bj_tz = timezone(timedelta(hours=8))
+    return datetime.now(bj_tz)
 
 
 # 自定义函数：将数字转换为中文
@@ -253,32 +278,21 @@ def convert_date_to_chinese(nongli_date):
 
 
 def get_weekday():
-    weekd = ''
-    # 日期时间
-    date = (get_beijing_time()).strftime("%Y-%m-%d %X")
-    # 农历日期
+    """获取当前日期、星期和农历日期"""
     now = get_beijing_time()
+    date_str = now.strftime("%Y-%m-%d %X")
 
-    # 获取农历日期
-    nongli_date = zhdate.ZhDate.from_datetime(now)  # 使用北京时间获取农历日期
-    # 获取农历日期的中文大写格式
+    # 农历日期（zhdate 不支持 aware datetime，需去掉时区信息）
+    nongli_date = zhdate.ZhDate.from_datetime(now.replace(tzinfo=None))
     nongli_date_chinese = convert_date_to_chinese(nongli_date)
-    # 星期
-    dayOfWeek = (get_beijing_time()).weekday()
-    if dayOfWeek == 0:
-        weekd = date + "  星期一"
-    if dayOfWeek == 1:
-        weekd = date + "  星期二"
-    if dayOfWeek == 2:
-        weekd = date + "  星期三"
-    if dayOfWeek == 3:
-        weekd = date + "  星期四"
-    if dayOfWeek == 4:
-        weekd = date + "  星期五"
-    if dayOfWeek == 5:
-        weekd = date + "  星期六"
-    if dayOfWeek == 6:
-        weekd = date + "  星期日"
+
+    # 星期映射
+    weekday_map = {
+        0: "星期一", 1: "星期二", 2: "星期三", 3: "星期四",
+        4: "星期五", 5: "星期六", 6: "星期日"
+    }
+    weekd = f"{date_str}  {weekday_map[now.weekday()]}"
+
     return weekd, nongli_date_chinese
 
 
@@ -309,49 +323,54 @@ def get_weather(city, api_key='7c75b7045984a1ffc81b7bf751b783c1'):
 
 # 计算在一起的日期
 def get_count():
-    delta = get_beijing_time() - datetime.strptime(start_date, "%Y-%m-%d")
+    now = get_beijing_time()
+    # 让 strptime 结果带上时区，避免 aware-naive 比较报错
+    bj_tz = timezone(timedelta(hours=8))
+    start = datetime.strptime(start_date, "%Y-%m-%d").replace(tzinfo=bj_tz)
+    delta = now - start
     return delta.days + 1
 
 
 # 计算距离下一次生日多少天
 def get_birthday(birthday):
-    today = get_beijing_time().date()  # 获取当前北京时间的日期
-    next_birthday = datetime.strptime(str(today.year) + "-" + birthday, "%Y-%m-%d")
+    now = get_beijing_time()
+    today = now.date()
+    bj_tz = timezone(timedelta(hours=8))
+    next_birthday = datetime.strptime(str(today.year) + "-" + birthday, "%Y-%m-%d").replace(tzinfo=bj_tz)
 
     # 如果生日已经过了，则计算明年的生日
-    if next_birthday < get_beijing_time():
+    if next_birthday < now:
         next_birthday = next_birthday.replace(year=next_birthday.year + 1)
 
-    days_until_birthday = (next_birthday.date() - today).days  # 计算距离生日的天数
+    days_until_birthday = (next_birthday.date() - today).days
     return days_until_birthday
 
 
 # 计算到元旦、春节的日期
 def get_spr(yd, sp):
-    today = get_beijing_time().date()  # 使用北京时间的当前日期
+    """计算距离元旦和春节的天数"""
+    now = get_beijing_time()
+    today = now.date()
+    bj_tz = timezone(timedelta(hours=8))
 
-    # 计算元旦的日期
-    next1 = datetime.strptime(str(today.year) + "-" + yd, "%Y-%m-%d")
-    if next1 < get_beijing_time():
-        next1 = next1.replace(year=next1.year + 1)
-        j_yd = (next1.date() - today).days  # 计算元旦距离今天的天数
-    else:
-        j_yd = (next1.date() - today).days  # 计算元旦距离今天的天数
+    # 计算元旦的天数
+    next_yd = datetime.strptime(str(today.year) + "-" + yd, "%Y-%m-%d").replace(tzinfo=bj_tz)
+    if next_yd < now:
+        next_yd = next_yd.replace(year=next_yd.year + 1)
+    j_yd = (next_yd.date() - today).days
 
-    # 计算春节的日期
-    next2 = datetime.strptime(str(today.year) + "-" + sp, "%Y-%m-%d")
-    if next2 < get_beijing_time():
-        next2 = next2.replace(year=next2.year + 1)
-        j_cj = (next2.date() - today).days  # 计算春节距离今天的天数
-    else:
-        next2 = next2.replace(year=next2.year + 1)
-        j_cj = (next2.date() - today).days  # 计算春节距离今天的天数
+    # 计算春节的天数（修复：不再无条件+1年）
+    next_cj = datetime.strptime(str(today.year) + "-" + sp, "%Y-%m-%d").replace(tzinfo=bj_tz)
+    if next_cj < now:
+        next_cj = next_cj.replace(year=next_cj.year + 1)
+    j_cj = (next_cj.date() - today).days
 
     return j_yd, j_cj
 
 
 # 每日金句
 def get_words():
+    """获取每日情话金句，API失败时使用本地备用句库"""
     words_list = [
         "我的世界，因你而暖。",
         "愿陪你走过每个春夏秋冬。",
@@ -372,24 +391,93 @@ def get_words():
         "你的名字，是我心中最温柔的诗。",
         "每天醒来，第一件事就是想你。",
         "爱你，从晨曦到暮色四合。",
-        "我的心里，住着一个可爱的你。"
+        "我的心里，住着一个可爱的你。",
+        "你笑起来真好看，像春天的花一样。",
+        "想把所有的温柔都给你。",
+        "你是我的例外，也是我的偏爱。",
+        "世界那么大，我的眼里只有你。",
+        "你的存在，就是我最大的安心。",
+        "喜欢你，是我做过最对的事。",
+        "愿往后余生，都有你相伴。",
+        "你是我写不完的温柔诗篇。",
+        "和你在一起，连空气都是甜的。",
+        "你是我所有不安的解药。",
     ]
-    try:
-        response = requests.get("https://api.shadiao.pro/chp", timeout=5)  # 设置超时时间
-        response.raise_for_status()  # 如果状态码不是 200，会抛出 HTTPError
-        text = response.json().get('data', {}).get('text', '')
-
-        # 如果文本的长度大于 20 个字，则重新请求
-        if len(text) > 20:
-            return get_words()
-        return text
-    except (requests.RequestException, ValueError):  # 捕获请求异常和 JSON 解析异常
-        return random.choice(words_list)  # 返回备用句子
+    # 循环尝试最多3次，避免递归导致栈溢出
+    for _ in range(3):
+        try:
+            response = requests.get("https://api.shadiao.pro/chp", timeout=5)
+            response.raise_for_status()
+            text = response.json().get('data', {}).get('text', '')
+            if len(text) <= 20:
+                return text
+        except (requests.RequestException, ValueError):
+            break
+    return random.choice(words_list)
 
 
 # 字体颜色，随机 每次不一样
 def get_random_color():
     return "#%06x" % random.randint(0, 0xFFFFFF)
+
+
+# 电视剧
+def top_tv():
+    """从豆瓣获取本周热门电视剧推荐"""
+    url = "https://movie.douban.com/chart?type=tv"
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/127.0.0.0 Safari/537.36"
+        ),
+        "Referer": "https://movie.douban.com/",
+        "Accept-Language": "zh-CN,zh;q=0.9",
+        "Cookie": (
+            "bid=gBOB68qc6u4; "
+            "_pk_id.100001.4cf6=a839b0f6b22f3b72.1754645362.; "
+            "_pk_ses.100001.4cf6=1; ap_v=0,6.0; "
+            "__utma=30149280.695913436.1754645363.1754645363.1754645363.1; "
+            "__utmb=30149280.0.10.1754645363; __utmc=30149280; "
+            "__utmz=30149280.1754645363.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); "
+            "__utma=223695111.1773430490.1754645363.1754645363.1754645363.1; "
+            "__utmc=223695111; "
+            "__utmz=223695111.1754645363.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); "
+            "__utmt=1; __utmb=223695111.1.10.1754645363"
+        )
+    }
+
+    # 随机延时，降低被反爬概率
+    time.sleep(random.uniform(1, 3))
+
+    for attempt in range(3):
+        try:
+            res = requests.get(url, headers=headers, timeout=5)
+            if res.status_code == 200:
+                break
+            else:
+                time.sleep(2)
+        except requests.RequestException:
+            time.sleep(2)
+    else:
+        return "暂时无法获取电视剧信息"
+
+    soup = BeautifulSoup(res.text, "html.parser")
+    items = soup.select('.pl2')
+
+    tv_list = []
+    for item in items:
+        full_title = item.a.get_text(strip=True)
+        name = full_title.split('/')[0].strip()
+        rating = item.find_next('span', class_='rating_nums')
+        score = rating.text.strip() if rating else "暂无评分"
+        tv_list.append((name, score))
+
+    if tv_list:
+        tv_name, rating = random.choice(tv_list)
+        return f"《{tv_name}》{rating}分"
+    else:
+        return "暂时无法获取电视剧信息"
 
 
 # 电影
@@ -516,6 +604,7 @@ data = {"m_n_a": {"value": m_n_a, "color": get_random_color()},
         "city2": {"value": city2, "color": get_random_color()},
         "weather2": {"value": wea2, "color": get_random_color()},
         "temperature2": {"value": str(temperature2) + "摄氏度", "color": get_random_color()},
+        "tv": {"value": top_tv(), "color": get_random_color()},
         "mv": {"value": top_mv(), "color": get_random_color()},
         "love_days": {"value": get_count(), "color": get_random_color()},
         "words": {"value": get_words(), "color": get_random_color()},
@@ -527,7 +616,7 @@ data = {"m_n_a": {"value": m_n_a, "color": get_random_color()},
 """
 # 模拟登录微信客户端
 client = WeChatClient(app_id, app_secret)
-# 实例化微信客户端x
+# 实例化微信客户端
 wm = WeChatMessage(client)
 
 """
@@ -536,96 +625,20 @@ wm = WeChatMessage(client)
 # 参数 接收对象、消息模板ID、数据（消息模板里面的的变量与字典数据做匹配）
 for i in range(0, len(user_id1)):
     res = wm.send_template(user_id1[i], template_id, data)
-    print(f"\n消息已推送至ID为{user_id1[i]}的微信用户，推送内容如下：\n"
-          f"  {data['m_n_a']['value']}\n"
-          f"  {data['eat']['value']}\n"
-          f"  所在城市：{data['city1']['value']}\n"
-          f"  当前时间：{data['daytime']['value'].strip()}\n"
-          f"  农历：{data['nongli']['value'].strip()}\n"
-          f"  今日天气：{data['weather1']['value']}\n"
-          f"  当前温度：{data['temperature1']['value']}\n"
-          f"  {data['sid']['value']}\n"
-          f"  距离生日还有{data['birthday_lover']['value']}天\n"
-          f"  距离元旦还有{data['yd']['value']}天\n"
-          f"  距离春节还有{data['cj']['value']}天\n"
-          f"  我们已经在一起{data['love_days']['value']}天啦\n"
-          f"  ===家乡:{data['city2']['value']} 天气:{data['weather2']['value']} 气温:{data['temperature2']['value']}===\n"
-          f"  今日电影推荐：{data['mv']['value']}\n"
-          f"  每日一句：{data['words']['value'].strip()}\n")
-
-# 模板
-'''
-=== 记得{{punch.DATA}}哦! ===
-问候：{{m_n_a.DATA}}
-祝福：{{eat.DATA}}
-所在城市：{{city1.DATA}} 
-当前时间：{{daytime.DATA}} 
-农历：{{nongli.DATA}} 
-今日天气：{{weather1.DATA}} 
-当前温度：{{temperature1.DATA}} 
-注意：{{sid.DATA}}
-距离生日还有{{birthday_lover.DATA}}天
-距离元旦还有{{yd.DATA}}天 
-距离春节还有{{cj.DATA}}天 
-=== 家乡:{{city2.DATA}} 天气:{{weather2.DATA}} 气温:{{temperature2.DATA}} === 
-今日电影推荐：{{mv.DATA}} 
-今天是我们在一起的第{{love_days.DATA}}天！
-每日一句：{{words.DATA}}
-'''
-
-# 模板
-"""
-=== 记得{{punch.DATA}}哦! ===
-问候：{{m_n_a.DATA}} 
-祝福：{{eat.DATA}} 
-所在城市：{{city1.DATA}} 
-当前时间：{{daytime.DATA}} 
-农历：{{nongli.DATA}} 
-今日天气：{{weather1.DATA}} 
-当前温度：{{temperature1.DATA}} 
-注意：{{sid.DATA}} 
-距离生日还有{{birthday_lover.DATA}}天 
-距离元旦还有{{yd.DATA}}天 
-距离春节还有{{cj.DATA}}天 
-=== 家乡:{{city2.DATA}} 天气:{{weather2.DATA}} 气温:{{temperature2.DATA}} === 
-今日电影推荐：{{mv.DATA}} 
-我们已经在一起 {{love_days.DATA}} 天啦！ 
-每日一句：{{words.DATA}}
-"""
-'''
-问候：{{m_n_a.DATA}}
-祝福：{{eat.DATA}}
-所在城市：{{city1.DATA}} 
-当前时间：{{daytime.DATA}} 
-农历：{{nongli.DATA}} 
-今日天气：{{weather1.DATA}} 
-当前温度：{{temperature1.DATA}} 
-注意：{{sid.DATA}}
-距离生日还有{{birthday_lover.DATA}}天
-距离元旦还有{{yd.DATA}}天 
-距离春节还有{{cj.DATA}}天 
-===家乡:{{city2.DATA}} 天气:{{weather2.DATA}} 气温:{{temperature2.DATA}}=== 
-今日电影新片榜首：{{mv.DATA}} 
-每日一句：{{words.DATA}}
-'''
-
-'''
-今日天气：{{weather1.DATA}} 
-当前温度：{{temperature1.DATA}} 
-{{sid.DATA}}
-距离元旦还有{{yd.DATA}}天 
-距离春节还有{{cj.DATA}}天 
-每日一句：{{words.DATA}}
-距离领导的生日还有{{birthday_lover.DATA}}天 
-距离秘书的生日还有{{birthday_my.DATA}}天 
-'''
-
-"""
-今日天气：{{weather1.DATA}} 
-当前温度：{{temperature1.DATA}} 
-{{sid.DATA}} 
-今天是我们在一起的第{{love_days.DATA}}天 
-距离元旦还有{{yd.DATA}}天 
-距离春节还有{{cj.DATA}}天 
-每日一句：{{words.DATA}}
-"""
+    # print(f"\n消息已推送至ID为{user_id1[i]}的微信用户，推送内容如下：\n"
+    #       f"  {data['m_n_a']['value']}\n"
+    #       f"  {data['eat']['value']}\n"
+    #       f"  所在城市：{data['city1']['value']}\n"
+    #       f"  当前时间：{data['daytime']['value'].strip()}\n"
+    #       f"  农历：{data['nongli']['value'].strip()}\n"
+    #       f"  今日天气：{data['weather1']['value']}\n"
+    #       f"  当前温度：{data['temperature1']['value']}\n"
+    #       f"  {data['sid']['value']}\n"
+    #       f"  距离生日还有{data['birthday_lover']['value']}天\n"
+    #       f"  距离元旦还有{data['yd']['value']}天\n"
+    #       f"  距离春节还有{data['cj']['value']}天\n"
+    #       f"  我们已经在一起{data['love_days']['value']}天啦\n"
+    #       f"  ===家乡:{data['city2']['value']} 天气:{data['weather2']['value']} 气温:{data['temperature2']['value']}===\n"
+    #       f"  今日电视剧推荐：{data['tv']['value']}\n"
+    #       f"  今日电影推荐：{data['mv']['value']}\n"
+    #       f"  每日一句：{data['words']['value'].strip()}\n")
