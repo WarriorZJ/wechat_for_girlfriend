@@ -625,20 +625,97 @@ wm = WeChatMessage(client)
 # 参数 接收对象、消息模板ID、数据（消息模板里面的的变量与字典数据做匹配）
 for i in range(0, len(user_id1)):
     res = wm.send_template(user_id1[i], template_id, data)
-    # print(f"\n消息已推送至ID为{user_id1[i]}的微信用户，推送内容如下：\n"
-    #       f"  {data['m_n_a']['value']}\n"
-    #       f"  {data['eat']['value']}\n"
-    #       f"  所在城市：{data['city1']['value']}\n"
-    #       f"  当前时间：{data['daytime']['value'].strip()}\n"
-    #       f"  农历：{data['nongli']['value'].strip()}\n"
-    #       f"  今日天气：{data['weather1']['value']}\n"
-    #       f"  当前温度：{data['temperature1']['value']}\n"
-    #       f"  {data['sid']['value']}\n"
-    #       f"  距离生日还有{data['birthday_lover']['value']}天\n"
-    #       f"  距离元旦还有{data['yd']['value']}天\n"
-    #       f"  距离春节还有{data['cj']['value']}天\n"
-    #       f"  我们已经在一起{data['love_days']['value']}天啦\n"
-    #       f"  ===家乡:{data['city2']['value']} 天气:{data['weather2']['value']} 气温:{data['temperature2']['value']}===\n"
-    #       f"  今日电视剧推荐：{data['tv']['value']}\n"
-    #       f"  今日电影推荐：{data['mv']['value']}\n"
-    #       f"  每日一句：{data['words']['value'].strip()}\n")
+    print(f"\n消息已推送至ID为{user_id1[i]}的微信用户，推送内容如下：\n"
+          f"  {data['m_n_a']['value']}\n"
+          f"  {data['eat']['value']}\n"
+          f"  所在城市：{data['city1']['value']}\n"
+          f"  当前时间：{data['daytime']['value'].strip()}\n"
+          f"  农历：{data['nongli']['value'].strip()}\n"
+          f"  今日天气：{data['weather1']['value']}\n"
+          f"  当前温度：{data['temperature1']['value']}\n"
+          f"  {data['sid']['value']}\n"
+          f"  距离生日还有{data['birthday_lover']['value']}天\n"
+          f"  距离元旦还有{data['yd']['value']}天\n"
+          f"  距离春节还有{data['cj']['value']}天\n"
+          f"  我们已经在一起{data['love_days']['value']}天啦\n"
+          f"  ===家乡:{data['city2']['value']} 天气:{data['weather2']['value']} 气温:{data['temperature2']['value']}===\n"
+          f"  今日电视剧推荐：{data['tv']['value']}\n"
+          f"  今日电影推荐：{data['mv']['value']}\n"
+          f"  每日一句：{data['words']['value'].strip()}\n")
+
+# 模板
+'''
+=== 记得{{punch.DATA}}哦! ===
+问候：{{m_n_a.DATA}}
+祝福：{{eat.DATA}}
+所在城市：{{city1.DATA}} 
+当前时间：{{daytime.DATA}} 
+农历：{{nongli.DATA}} 
+今日天气：{{weather1.DATA}} 
+当前温度：{{temperature1.DATA}} 
+注意：{{sid.DATA}}
+距离生日还有{{birthday_lover.DATA}}天
+距离元旦还有{{yd.DATA}}天 
+距离春节还有{{cj.DATA}}天 
+=== 家乡:{{city2.DATA}} 天气:{{weather2.DATA}} 气温:{{temperature2.DATA}} === 
+今日电影推荐：{{mv.DATA}} 
+今天是我们在一起的第{{love_days.DATA}}天！
+每日一句：{{words.DATA}}
+'''
+
+# 模板
+"""
+=== 记得{{punch.DATA}}哦! ===
+问候：{{m_n_a.DATA}} 
+祝福：{{eat.DATA}} 
+所在城市：{{city1.DATA}} 
+当前时间：{{daytime.DATA}} 
+农历：{{nongli.DATA}} 
+今日天气：{{weather1.DATA}} 
+当前温度：{{temperature1.DATA}} 
+注意：{{sid.DATA}} 
+距离生日还有{{birthday_lover.DATA}}天 
+距离元旦还有{{yd.DATA}}天 
+距离春节还有{{cj.DATA}}天 
+=== 家乡:{{city2.DATA}} 天气:{{weather2.DATA}} 气温:{{temperature2.DATA}} === 
+今日电影推荐：{{mv.DATA}} 
+我们已经在一起 {{love_days.DATA}} 天啦！ 
+每日一句：{{words.DATA}}
+"""
+'''
+问候：{{m_n_a.DATA}}
+祝福：{{eat.DATA}}
+所在城市：{{city1.DATA}} 
+当前时间：{{daytime.DATA}} 
+农历：{{nongli.DATA}} 
+今日天气：{{weather1.DATA}} 
+当前温度：{{temperature1.DATA}} 
+注意：{{sid.DATA}}
+距离生日还有{{birthday_lover.DATA}}天
+距离元旦还有{{yd.DATA}}天 
+距离春节还有{{cj.DATA}}天 
+===家乡:{{city2.DATA}} 天气:{{weather2.DATA}} 气温:{{temperature2.DATA}}=== 
+今日电影新片榜首：{{mv.DATA}} 
+每日一句：{{words.DATA}}
+'''
+
+'''
+今日天气：{{weather1.DATA}} 
+当前温度：{{temperature1.DATA}} 
+{{sid.DATA}}
+距离元旦还有{{yd.DATA}}天 
+距离春节还有{{cj.DATA}}天 
+每日一句：{{words.DATA}}
+距离领导的生日还有{{birthday_lover.DATA}}天 
+距离秘书的生日还有{{birthday_my.DATA}}天 
+'''
+
+"""
+今日天气：{{weather1.DATA}} 
+当前温度：{{temperature1.DATA}} 
+{{sid.DATA}} 
+今天是我们在一起的第{{love_days.DATA}}天 
+距离元旦还有{{yd.DATA}}天 
+距离春节还有{{cj.DATA}}天 
+每日一句：{{words.DATA}}
+"""
