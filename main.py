@@ -6,7 +6,6 @@ from datetime import datetime, timedelta, timezone
 
 import requests
 import zhdate
-from bs4 import BeautifulSoup
 from wechatpy import WeChatClient
 from wechatpy.client.api import WeChatMessage
 
@@ -421,121 +420,64 @@ def get_random_color():
     return "#%06x" % random.randint(0, 0xFFFFFF)
 
 
-# 电视剧
+# 豆瓣通用请求头
+DOUBAN_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/127.0.0.0 Safari/537.36"
+    ),
+    "Referer": "https://movie.douban.com/",
+}
+
+
+def _fetch_douban_hot(media_type, fallback_name, tag="热门"):
+    """
+    从豆瓣热门 API 获取最新热门电视剧/电影
+    :param media_type: 'tv' 或 'movie'
+    :param fallback_name: 获取失败时的提示文字
+    :param tag: 筛选标签，如 '热门'、'国产剧'
+    :return: 格式化的推荐字符串
+    """
+    url = "https://movie.douban.com/j/search_subjects"
+    params = {
+        "type": media_type,
+        "tag": tag,
+        "page_limit": 10,
+        "page_start": 0,
+    }
+
+    time.sleep(random.uniform(0.5, 1.5))
+
+    for attempt in range(3):
+        try:
+            res = requests.get(url, params=params, headers=DOUBAN_HEADERS, timeout=5)
+            if res.status_code == 200:
+                subjects = res.json().get("subjects", [])
+                if subjects:
+                    # 只保留有评分的，优先推荐高分
+                    rated = [s for s in subjects if s.get("rate")]
+                    pick = random.choice(rated) if rated else random.choice(subjects)
+                    name = pick["title"]
+                    score = pick.get("rate", "暂无")
+                    return f"《{name}》{score}分"
+                break
+            else:
+                time.sleep(2)
+        except (requests.RequestException, ValueError, KeyError):
+            time.sleep(2)
+
+    return f"暂时无法获取{fallback_name}信息"
+
+
 def top_tv():
-    """从豆瓣获取本周热门电视剧推荐"""
-    url = "https://movie.douban.com/chart?type=tv"
-    headers = {
-        "User-Agent": (
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/127.0.0.0 Safari/537.36"
-        ),
-        "Referer": "https://movie.douban.com/",
-        "Accept-Language": "zh-CN,zh;q=0.9",
-        "Cookie": (
-            "bid=gBOB68qc6u4; "
-            "_pk_id.100001.4cf6=a839b0f6b22f3b72.1754645362.; "
-            "_pk_ses.100001.4cf6=1; ap_v=0,6.0; "
-            "__utma=30149280.695913436.1754645363.1754645363.1754645363.1; "
-            "__utmb=30149280.0.10.1754645363; __utmc=30149280; "
-            "__utmz=30149280.1754645363.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); "
-            "__utma=223695111.1773430490.1754645363.1754645363.1754645363.1; "
-            "__utmc=223695111; "
-            "__utmz=223695111.1754645363.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); "
-            "__utmt=1; __utmb=223695111.1.10.1754645363"
-        )
-    }
-
-    # 随机延时，降低被反爬概率
-    time.sleep(random.uniform(1, 3))
-
-    for attempt in range(3):
-        try:
-            res = requests.get(url, headers=headers, timeout=5)
-            if res.status_code == 200:
-                break
-            else:
-                time.sleep(2)
-        except requests.RequestException:
-            time.sleep(2)
-    else:
-        return "暂时无法获取电视剧信息"
-
-    soup = BeautifulSoup(res.text, "html.parser")
-    items = soup.select('.pl2')
-
-    tv_list = []
-    for item in items:
-        full_title = item.a.get_text(strip=True)
-        name = full_title.split('/')[0].strip()
-        rating = item.find_next('span', class_='rating_nums')
-        score = rating.text.strip() if rating else "暂无评分"
-        tv_list.append((name, score))
-
-    if tv_list:
-        tv_name, rating = random.choice(tv_list)
-        return f"《{tv_name}》{rating}分"
-    else:
-        return "暂时无法获取电视剧信息"
+    """从豆瓣获取最新热门国产剧推荐"""
+    return _fetch_douban_hot("tv", "电视剧", tag="国产剧")
 
 
-# 电影
 def top_mv():
-    url = "https://movie.douban.com/chart"
-    headers = {
-        "User-Agent": (
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/127.0.0.0 Safari/537.36"
-        ),
-        "Referer": "https://movie.douban.com/",
-        "Accept-Language": "zh-CN,zh;q=0.9",
-        "Cookie": (
-            "bid=gBOB68qc6u4; "
-            "_pk_id.100001.4cf6=a839b0f6b22f3b72.1754645362.; "
-            "_pk_ses.100001.4cf6=1; ap_v=0,6.0; "
-            "__utma=30149280.695913436.1754645363.1754645363.1754645363.1; "
-            "__utmb=30149280.0.10.1754645363; __utmc=30149280; "
-            "__utmz=30149280.1754645363.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); "
-            "__utma=223695111.1773430490.1754645363.1754645363.1754645363.1; "
-            "__utmc=223695111; "
-            "__utmz=223695111.1754645363.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); "
-            "__utmt=1; __utmb=223695111.1.10.1754645363"
-        )
-    }
-
-    # 随机延时，降低被反爬概率
-    time.sleep(random.uniform(1, 3))
-
-    for attempt in range(3):
-        try:
-            res = requests.get(url, headers=headers, timeout=5)
-            if res.status_code == 200:
-                break
-            else:
-                time.sleep(2)
-        except requests.RequestException:
-            time.sleep(2)
-    else:
-        return "暂时无法获取电影信息"
-
-    soup = BeautifulSoup(res.text, "html.parser")
-    items = soup.select('.pl2')
-
-    movie_list = []
-    for item in items:
-        full_title = item.a.get_text(strip=True)
-        name = full_title.split('/')[0].strip()
-        rating = item.find_next('span', class_='rating_nums')
-        score = rating.text.strip() if rating else "暂无评分"
-        movie_list.append((name, score))
-
-    if movie_list:
-        movie_name, rating = random.choice(movie_list)
-        return f"《{movie_name}》{rating}分"
-    else:
-        return "暂时无法获取电影信息"
+    """从豆瓣获取最新热门电影推荐"""
+    return _fetch_douban_hot("movie", "电影")
 
 
 """
@@ -547,14 +489,36 @@ wea2, temperature2 = get_weather(city2)
 
 # 计算到春节的天数
 j_yd, j_cj = get_spr(yd, sp)
-# 如果温度过高，提示语
-sid = ""
-if temperature1 >= 23:
-    sid = "室外温度较高，注意喝水哦"
-elif temperature1 <= 17:
-    sid = "室外温度过低，记得多穿点衣服保暖"
-else:
-    sid = "温度不高不低，但也要注意及时补水哦"
+
+
+# 根据天气和温度生成生活建议
+def get_weather_advice(weather, temperature):
+    """根据天气状况和温度给出贴心建议"""
+    # 特殊天气优先
+    if "雨" in weather:
+        return "今天有雨，出门记得带伞哦"
+    if "雪" in weather:
+        return "今天有雪，路滑注意安全，多穿点"
+    if "雾" in weather or "霾" in weather:
+        return "今天有雾霾，出门记得戴口罩"
+    if "风" in weather:
+        return "今天风大，注意防风保暖"
+    # 温度建议
+    if temperature >= 35:
+        return "高温预警！尽量减少外出，注意防暑降温"
+    if temperature >= 28:
+        return "天气较热，注意多喝水防中暑"
+    if temperature >= 23:
+        return "温度适宜，适合外出活动"
+    if temperature >= 10:
+        return "天气微凉，记得添件外套"
+    if temperature >= 0:
+        return "天气较冷，注意保暖防寒"
+    return "天气很冷，出门务必穿厚衣服"
+
+
+sid1 = get_weather_advice(wea1, temperature1)
+sid2 = get_weather_advice(wea2, temperature2)
 
 # 提醒吃饭
 now_time = get_beijing_time().hour
@@ -597,8 +561,10 @@ data = {"m_n_a": {"value": m_n_a, "color": get_random_color()},
         "nongli": {"value": get_weekday()[1], "color": get_random_color()},
         "weather1": {"value": wea1, "color": get_random_color()},
         "temperature1": {"value": str(temperature1) + "摄氏度", "color": get_random_color()},
-        "sid": {"value": sid, "color": get_random_color()},
+        "sid": {"value": sid1, "color": get_random_color()},
+        "sid2": {"value": sid2, "color": get_random_color()},
         "birthday_lover": {"value": get_birthday(birthday_lover), "color": get_random_color()},
+        "birthday_my": {"value": get_birthday(birthday_my), "color": get_random_color()},
         "yd": {"value": j_yd, "color": get_random_color()},
         "cj": {"value": j_cj, "color": get_random_color()},
         "city2": {"value": city2, "color": get_random_color()},
@@ -625,97 +591,31 @@ wm = WeChatMessage(client)
 # 参数 接收对象、消息模板ID、数据（消息模板里面的的变量与字典数据做匹配）
 for i in range(0, len(user_id1)):
     res = wm.send_template(user_id1[i], template_id, data)
-    print(f"\n消息已推送至ID为{user_id1[i]}的微信用户，推送内容如下：\n"
-          f"  {data['m_n_a']['value']}\n"
-          f"  {data['eat']['value']}\n"
-          f"  所在城市：{data['city1']['value']}\n"
-          f"  当前时间：{data['daytime']['value'].strip()}\n"
-          f"  农历：{data['nongli']['value'].strip()}\n"
-          f"  今日天气：{data['weather1']['value']}\n"
-          f"  当前温度：{data['temperature1']['value']}\n"
-          f"  {data['sid']['value']}\n"
-          f"  距离生日还有{data['birthday_lover']['value']}天\n"
-          f"  距离元旦还有{data['yd']['value']}天\n"
-          f"  距离春节还有{data['cj']['value']}天\n"
-          f"  我们已经在一起{data['love_days']['value']}天啦\n"
-          f"  ===家乡:{data['city2']['value']} 天气:{data['weather2']['value']} 气温:{data['temperature2']['value']}===\n"
-          f"  今日电视剧推荐：{data['tv']['value']}\n"
-          f"  今日电影推荐：{data['mv']['value']}\n"
-          f"  每日一句：{data['words']['value'].strip()}\n")
+    print(f"\n{'=' * 40}")
+    print(f"消息已推送至ID为 {user_id1[i]} 的微信用户")
+    print(f"{'=' * 40}")
+    print(f"  === 记得{data['punch']['value']}! ===")
+    print(f"  当前时间：{data['daytime']['value'].strip()}")
+    print(f"  农历：{data['nongli']['value'].strip()}")
+    print(f"  问候：{data['m_n_a']['value']}")
+    print(f"  祝福：{data['eat']['value']}")
+    print(f"  == To 噜妹～ ==")
+    print(f"  所在城市：{data['city1']['value']}")
+    print(f"  城市天气：{data['weather1']['value']}")
+    print(f"  城市温度：{data['temperature1']['value']}")
+    print(f"  距离生日还有 {data['birthday_lover']['value']} 天")
+    print(f"  注意：{data['sid']['value']}")
+    print(f"  == To 噜哥～ ==")
+    print(f"  所在城市：{data['city2']['value']}")
+    print(f"  城市天气：{data['weather2']['value']}")
+    print(f"  城市温度：{data['temperature2']['value']}")
+    print(f"  距离生日还有 {data['birthday_my']['value']} 天")
+    print(f"  注意：{data['sid2']['value']}")
+    print(f"  今天是我们在一起的第 {data['love_days']['value']} 天哦！")
+    print(f"  距离元旦还有 {data['yd']['value']} 天")
+    print(f"  距离春节还有 {data['cj']['value']} 天")
+    print(f"  今日电视剧推荐：{data['tv']['value']}")
+    print(f"  今日电影推荐：{data['mv']['value']}")
+    print(f"  每日一句：{data['words']['value'].strip()}")
 
-# 模板
-'''
-=== 记得{{punch.DATA}}哦! ===
-问候：{{m_n_a.DATA}}
-祝福：{{eat.DATA}}
-所在城市：{{city1.DATA}} 
-当前时间：{{daytime.DATA}} 
-农历：{{nongli.DATA}} 
-今日天气：{{weather1.DATA}} 
-当前温度：{{temperature1.DATA}} 
-注意：{{sid.DATA}}
-距离生日还有{{birthday_lover.DATA}}天
-距离元旦还有{{yd.DATA}}天 
-距离春节还有{{cj.DATA}}天 
-=== 家乡:{{city2.DATA}} 天气:{{weather2.DATA}} 气温:{{temperature2.DATA}} === 
-今日电影推荐：{{mv.DATA}} 
-今天是我们在一起的第{{love_days.DATA}}天！
-每日一句：{{words.DATA}}
-'''
 
-# 模板
-"""
-=== 记得{{punch.DATA}}哦! ===
-问候：{{m_n_a.DATA}} 
-祝福：{{eat.DATA}} 
-所在城市：{{city1.DATA}} 
-当前时间：{{daytime.DATA}} 
-农历：{{nongli.DATA}} 
-今日天气：{{weather1.DATA}} 
-当前温度：{{temperature1.DATA}} 
-注意：{{sid.DATA}} 
-距离生日还有{{birthday_lover.DATA}}天 
-距离元旦还有{{yd.DATA}}天 
-距离春节还有{{cj.DATA}}天 
-=== 家乡:{{city2.DATA}} 天气:{{weather2.DATA}} 气温:{{temperature2.DATA}} === 
-今日电影推荐：{{mv.DATA}} 
-我们已经在一起 {{love_days.DATA}} 天啦！ 
-每日一句：{{words.DATA}}
-"""
-'''
-问候：{{m_n_a.DATA}}
-祝福：{{eat.DATA}}
-所在城市：{{city1.DATA}} 
-当前时间：{{daytime.DATA}} 
-农历：{{nongli.DATA}} 
-今日天气：{{weather1.DATA}} 
-当前温度：{{temperature1.DATA}} 
-注意：{{sid.DATA}}
-距离生日还有{{birthday_lover.DATA}}天
-距离元旦还有{{yd.DATA}}天 
-距离春节还有{{cj.DATA}}天 
-===家乡:{{city2.DATA}} 天气:{{weather2.DATA}} 气温:{{temperature2.DATA}}=== 
-今日电影新片榜首：{{mv.DATA}} 
-每日一句：{{words.DATA}}
-'''
-
-'''
-今日天气：{{weather1.DATA}} 
-当前温度：{{temperature1.DATA}} 
-{{sid.DATA}}
-距离元旦还有{{yd.DATA}}天 
-距离春节还有{{cj.DATA}}天 
-每日一句：{{words.DATA}}
-距离领导的生日还有{{birthday_lover.DATA}}天 
-距离秘书的生日还有{{birthday_my.DATA}}天 
-'''
-
-"""
-今日天气：{{weather1.DATA}} 
-当前温度：{{temperature1.DATA}} 
-{{sid.DATA}} 
-今天是我们在一起的第{{love_days.DATA}}天 
-距离元旦还有{{yd.DATA}}天 
-距离春节还有{{cj.DATA}}天 
-每日一句：{{words.DATA}}
-"""
