@@ -12,6 +12,15 @@ from wechatpy.client.api import WeChatMessage
 """
 1、从配置文件中获取变量
 """
+# 若明文 config.conf 不存在，则尝试由加密文件 config.conf.enc 解密还原
+# 解密密钥来自环境变量 WECHAT_CONF_KEY（本地开发保留明文 config.conf 时此步会被跳过）
+try:
+    from crypto_config import decrypt_config
+    if not os.path.exists("config.conf"):
+        decrypt_config()
+except Exception as e:
+    print(f"读取配置失败：{e}")
+
 conf = configparser.ConfigParser()
 config_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 conf.read('config.conf', 'utf8')
@@ -590,7 +599,7 @@ wm = WeChatMessage(client)
 """
 # 参数 接收对象、消息模板ID、数据（消息模板里面的的变量与字典数据做匹配）
 for i in range(0, len(user_id1)):
-    res = wm.send_template(user_id1[i], template_id, data)
+    # res = wm.send_template(user_id1[i], template_id, data)
     print(f"\n{'=' * 40}")
     print(f"消息已推送至ID为 {user_id1[i]} 的微信用户")
     print(f"{'=' * 40}")

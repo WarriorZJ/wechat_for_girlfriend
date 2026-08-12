@@ -1,0 +1,9 @@
+# IDE / 系统
+.idea/
+__pycache__/
+*.pyc
+.DS_Store
+
+# 明文配置（含私密信息，绝不提交；只提交加密后的 config.conf.enc）
+config.conf
+.env
