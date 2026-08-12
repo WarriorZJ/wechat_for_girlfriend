@@ -599,7 +599,7 @@ wm = WeChatMessage(client)
 """
 # 参数 接收对象、消息模板ID、数据（消息模板里面的的变量与字典数据做匹配）
 for i in range(0, len(user_id1)):
-    # res = wm.send_template(user_id1[i], template_id, data)
+    res = wm.send_template(user_id1[i], template_id, data)
     print(f"\n{'=' * 40}")
     print(f"消息已推送至ID为 {user_id1[i]} 的微信用户")
     print(f"{'=' * 40}")
