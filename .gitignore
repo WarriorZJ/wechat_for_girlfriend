@@ -7,3 +7,11 @@ __pycache__/
 # 明文配置（含私密信息，绝不提交；只提交加密后的 config.conf.enc）
 config.conf
 .env
+
+# 暂不纳入仓库的文件（按需自行决定是否提交）
+.github/workflows/python-application.yml
+seven_stars.py
+test.py
+html爱心代码/
+shengds/
+代码合集(持续更新中)/
