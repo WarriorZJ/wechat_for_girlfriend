@@ -424,6 +424,38 @@ def get_words():
     return random.choice(words_list)
 
 
+# 每日宜忌（本地词库随机拼，稳定不依赖外部接口）
+_YI = ["出行", "约会", "表白", "观影", "散步", "做饭", "读书", "健身",
+       "拍照", "逛街", "喝奶茶", "写日记", "早睡", "撸猫", "种花"]
+_JI = ["熬夜", "生气", "拖延", "暴饮暴食", "久坐", "内耗", "挑食",
+       "错过晚安", "忘带钥匙", "喝太多冰的"]
+def get_yi_ji():
+    yi = random.sample(_YI, 2)          # 随机宜 2 项
+    ji = random.sample(_JI, 1)          # 随机忌 1 项
+    return f"宜{yi[0]}、{yi[1]}；忌{ji[0]}"
+
+
+# 美食推荐（本地菜库随机，稳定不依赖外部接口）
+_FOOD = ["番茄牛腩", "可乐鸡翅", "酸菜鱼", "红烧肉", "糖醋排骨",
+         "麻辣香锅", "日式咖喱饭", "芝士焗饭", "皮蛋瘦肉粥", "葱油拌面",
+         "螺蛳粉", "羊肉串", "小笼包", "提拉米苏", "芒果班戟", "草莓大福"]
+def get_food():
+    return random.choice(_FOOD) + "（今天试试这个？）"
+
+
+def get_weibo_hot():
+    """获取微博热搜第一条，失败回退本地"""
+    try:
+        r = requests.get("https://60s.viki.moe/v2/weibo", timeout=5)
+        if r.status_code == 200:
+            items = r.json().get("data", [])
+            if items:
+                return items[0].get("title", "")
+    except (requests.RequestException, ValueError, KeyError):
+        pass
+    return "今天热搜有点害羞，躲起来了"
+
+
 # 字体颜色，随机 每次不一样
 def get_random_color():
     return "#%06x" % random.randint(0, 0xFFFFFF)
@@ -533,7 +565,7 @@ sid2 = get_weather_advice(wea2, temperature2)
 now_time = get_beijing_time().hour
 eat = ""
 m_n_a = ""
-if 9 > now_time > 0:
+if 9 > now_time >= 0:       # 凌晨0点~早9点前（含0点，深夜/清晨统一问候）
     eat = get_morning_words()
     m_n_a = "早上好吖！"
 if 12 > now_time >= 9:
@@ -583,6 +615,9 @@ data = {"m_n_a": {"value": m_n_a, "color": get_random_color()},
         "mv": {"value": top_mv(), "color": get_random_color()},
         "love_days": {"value": get_count(), "color": get_random_color()},
         "words": {"value": get_words(), "color": get_random_color()},
+        "yiji": {"value": get_yi_ji(), "color": get_random_color()},
+        "food": {"value": get_food(), "color": get_random_color()},
+        "weibo": {"value": get_weibo_hot(), "color": get_random_color()},
         "punch": {"value": check_time(), "color": get_random_color()}
         }
 
@@ -599,32 +634,47 @@ wm = WeChatMessage(client)
 """
 # 参数 接收对象、消息模板ID、数据（消息模板里面的的变量与字典数据做匹配）
 for i in range(0, len(user_id1)):
-    # res = wm.send_template(user_id1[i], template_id, data)
-    print(f"\n{'=' * 40}")
-    print(f"消息已推送至ID为 {user_id1[i]} 的微信用户")
-    print(f"{'=' * 40}")
-    print(f"  === 记得{data['punch']['value']}! ===")
-    print(f"  当前时间：{data['daytime']['value'].strip()}")
-    print(f"  农历：{data['nongli']['value'].strip()}")
-    print(f"  问候：{data['m_n_a']['value']}")
-    print(f"  祝福：{data['eat']['value']}")
-    print(f"  == To 噜妹～ ==")
-    print(f"  所在城市：{data['city1']['value']}")
-    print(f"  城市天气：{data['weather1']['value']}")
-    print(f"  城市温度：{data['temperature1']['value']}")
-    print(f"  距离生日还有 {data['birthday_lover']['value']} 天")
-    print(f"  注意：{data['sid']['value']}")
-    print(f"  == To 噜哥～ ==")
-    print(f"  所在城市：{data['city2']['value']}")
-    print(f"  城市天气：{data['weather2']['value']}")
-    print(f"  城市温度：{data['temperature2']['value']}")
-    print(f"  距离生日还有 {data['birthday_my']['value']} 天")
-    print(f"  注意：{data['sid2']['value']}")
-    print(f"  今天是我们在一起的第 {data['love_days']['value']} 天哦！")
-    print(f"  距离元旦还有 {data['yd']['value']} 天")
-    print(f"  距离春节还有 {data['cj']['value']} 天")
-    print(f"  今日电视剧推荐：{data['tv']['value']}")
-    print(f"  今日电影推荐：{data['mv']['value']}")
-    print(f"  每日一句：{data['words']['value'].strip()}")
+    res = wm.send_template(user_id1[i], template_id, data)
+    # 取出本次要发送的字段值
+    v = {k: data[k]["value"] for k in data}
+    v["daytime"] = v["daytime"].strip()
+    v["nongli"] = v["nongli"].strip()
+    v["words"] = v["words"].strip()
+
+    message = f"""
+{'=' * 40}
+消息已推送至ID为 {user_id1[i]} 的微信用户
+{'=' * 40}
+💬 {v['m_n_a']}
+🎊 {v['eat']}
+
+⏰ 记得{v['punch']}哦！
+📅 {v['daytime']}　
+农历：{v['nongli']}
+
+🌤️ To 噜妹～
+城市：{v['city1']}
+天气：{v['weather1']}　{v['temperature1']}
+距离生日还有 {v['birthday_lover']} 天
+提醒：{v['sid']}
+
+🌤️ To 噜哥～
+城市：{v['city2']}
+天气：{v['weather2']}　{v['temperature2']}
+距离生日还有 {v['birthday_my']} 天
+提醒：{v['sid2']}
+
+💞 这是我们在一起的第 {v['love_days']} 天
+🎉 距离元旦 {v['yd']} 天，距离春节 {v['cj']} 天
+
+📜 今日宜忌：{v['yiji']}
+🍜 美食推荐：{v['food']}
+🔥 微博热搜：{v['weibo']}
+
+📺 今日剧：{v['tv']}
+🎬 今日影：{v['mv']}
+♥️ 每日一句：{v['words']}
+"""
+    print(message)
 
 

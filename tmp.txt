@@ -1,26 +1,48 @@
-# 模板（噜哥 ❤️噜妹）
-'''
-=== 记得{{punch.DATA}}! ===
-当前时间：{{daytime.DATA}}
+================================================================
+ 微信测试号「模板消息」内容（直接复制到平台 → 模板消息接口 → 新增模板）
+ 变量名已与 main.py 的 data 字典一一对应。
+================================================================
+
+💬 {{m_n_a.DATA}}
+🎊 {{eat.DATA}}
+
+⏰ 记得{{punch.DATA}}哦！
+📅 {{daytime.DATA}}　
 农历：{{nongli.DATA}}
-问候：{{m_n_a.DATA}}
-祝福：{{eat.DATA}}
-=== To 噜妹～ ===
-所在城市：{{city1.DATA}}
-城市天气：{{weather1.DATA}}
-城市温度：{{temperature1.DATA}}
+
+🌤️ To 噜妹～
+城市：{{city1.DATA}}
+天气：{{weather1.DATA}}　{{temperature1.DATA}}
 距离生日还有 {{birthday_lover.DATA}} 天
-注意：{{sid.DATA}}
-=== To 噜哥～ ===
-所在城市：{{city2.DATA}}
-城市天气：{{weather2.DATA}}
-城市温度：{{temperature2.DATA}}
+提醒：{{sid.DATA}}
+
+🌤️ To 噜哥～
+城市：{{city2.DATA}}
+天气：{{weather2.DATA}}　{{temperature2.DATA}}
 距离生日还有 {{birthday_my.DATA}} 天
-注意：{{sid2.DATA}}
-今天是我们在一起的第 {{love_days.DATA}} 天哦！
-距离元旦还有 {{yd.DATA}} 天
-距离春节还有 {{cj.DATA}} 天
-今日电视剧推荐：{{tv.DATA}}
-今日电影推荐：{{mv.DATA}}
-每日一句：{{words.DATA}}
-'''
+提醒：{{sid2.DATA}}
+
+💞 这是我们在一起的第 {{love_days.DATA}} 天
+🎉 距离元旦 {{yd.DATA}} 天，距离春节 {{cj.DATA}} 天
+
+📜 今日宜忌：{{yiji.DATA}}
+🍜 美食推荐：{{food.DATA}}
+🔥 微博热搜：{{weibo.DATA}}
+
+📺 今日剧：{{tv.DATA}}
+🎬 今日影：{{mv.DATA}}
+♥️ 每日一句：{{words.DATA}}
+
+
+
+================================================================
+ 注：
+ - 变量需与 main.py 的 data 字典 key 完全一致（m_n_a / eat / daytime /
+   nongli / city1 / weather1 / temperature1 / birthday_lover / sid / city2 /
+   weather2 / temperature2 / birthday_my / sid2 / love_days / yd / cj / tv /
+   mv / words / weibo / yiji / food / punch）
+ - 今日要闻(news)已移除，避免整条消息超长被微信截断
+ - 保留：微博热搜(weibo)、每日宜忌(yiji)、美食推荐(food)
+ - 保存模板后会得到新的 template_id，若与 config.conf 里的 template_id 不同，
+   需同步修改 config.conf 并重新加密（python3 crypto_config.py encrypt）
+================================================================
