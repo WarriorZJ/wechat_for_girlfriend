@@ -677,5 +677,3 @@ for i in range(0, len(user_id1)):
 ♥️ 每日一句：{v['words']}
 """
     print(message)
-
-
