@@ -444,11 +444,12 @@ def get_food():
 
 
 def get_weibo_hot():
-    """获取微博热搜第一条，失败回退本地"""
+    """获取百度热搜第一条（原微博热搜源 60s.viki.moe 已被 Cloudflare 拦截，改用百度热搜），失败回退本地"""
     try:
-        r = requests.get("https://60s.viki.moe/v2/weibo", timeout=5)
+        r = requests.get("https://v.api.aa1.cn/api/topbaidu/index.php",
+                         headers={"User-Agent": "Mozilla/5.0"}, timeout=5)
         if r.status_code == 200:
-            items = r.json().get("data", [])
+            items = r.json().get("newslist", [])
             if items:
                 return items[0].get("title", "")
     except (requests.RequestException, ValueError, KeyError):
